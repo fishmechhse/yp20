@@ -109,28 +109,28 @@ diagnostic_superclass - аббревиатуры диагнозов - numpy.ndar
 |              | HYP     | Hypertrophy               | 
 |              | STTC    | ST/T change               | 
 
-| Subclasses | NORM | 	NORM                              | Normal ECG                                                   |
-|------------|------|------------------------------------|--------------------------------------------------------------|
-|            | CD	  | LAFB/LPFB                          | 	left anterior/left posterior fascicular block               |
-|            |      | IRBBB                              | 	incomplete right bundle branch block                        |
-|            |      | ILBBB                              | 	incomplete left bundle branch block                         |
-|            |      | CLBBB	                             | complete left bundle branch block                            |
-|            |      | CRBBB                              | 	complete right bundle branch block                          |
-|            |      | AVB                                | 	AV block                                                    |
-|            |      | IVCB	                              | non-specific intraventricular conduction disturbance (block) |
-|            |      | WPW	                               | Wolff-Parkinson-White syndrome                               |                           
-|            | HYP  | LVH	                               | 	left ventricular hypertrophy                                |                          
-|            |      | RHV	                               | right ventricular hypertrophy                                |                            
-|            |      | LAO/LAE	                           | left atrial overload/enlargement                             |                     
-|            |      | RAO/RAE	                           | right atrial overload/enlargement                            |                     
-|            |      | SEHYP	                             | septal hypertrophy                                           |                                      
-|            | MI	  | AMI	anterior myocardial infarction |
-|            |      | IMI	                               | inferior myocardial infarction                               |                           
-|            |      | LMI	                               | lateral myocardial infarction                                |                           
-|            |      | PMI	                               | posterior myocardial infarction                              |                         
-|            | STTC | ISCA	ischemic in anterior leads    |
-|            |      | ISCI	                              | ischemic in inferior leads                                   |                               
-|            |      | ISC_	                              | non-specific ischemic                                        |                                   
-|            |      | STTC	                              | ST-T changes                                                 |                                      
-|            |      | NST_	                              | non-specific ST changes                                      |                                  
+| Subclasses | NORM | 	NORM     | Normal ECG                                                   |
+|------------|------|-----------|--------------------------------------------------------------|
+|            | CD	  | LAFB/LPFB | 	left anterior/left posterior fascicular block               |
+|            |      | IRBBB     | 	incomplete right bundle branch block                        |
+|            |      | ILBBB     | 	incomplete left bundle branch block                         |
+|            |      | CLBBB	    | complete left bundle branch block                            |
+|            |      | CRBBB     | 	complete right bundle branch block                          |
+|            |      | AVB       | 	AV block                                                    |
+|            |      | IVCB	     | non-specific intraventricular conduction disturbance (block) |
+|            |      | WPW	      | Wolff-Parkinson-White syndrome                               |                           
+|            | HYP  | LVH	      | 	left ventricular hypertrophy                                |                          
+|            |      | RHV	      | right ventricular hypertrophy                                |                            
+|            |      | LAO/LAE	  | left atrial overload/enlargement                             |                     
+|            |      | RAO/RAE	  | right atrial overload/enlargement                            |                     
+|            |      | SEHYP	    | septal hypertrophy                                           |                                      
+|            | MI	  | AMI	      | anterior myocardial infarction                               |                           
+|            |      | IMI	      | inferior myocardial infarction                               |                           
+|            |      | LMI	      | lateral myocardial infarction                                |                           
+|            |      | PMI	      | posterior myocardial infarction                              |                         
+|            | STTC | ISCA      | 	ischemic in anterior leads                                  |
+|            |      | ISCI	     | ischemic in inferior leads                                   |                               
+|            |      | ISC_	     | non-specific ischemic                                        |                                   
+|            |      | STTC	     | ST-T changes                                                 |                                      
+|            |      | NST_	     | non-specific ST changes                                      |                                  
 
