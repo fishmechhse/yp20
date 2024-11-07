@@ -414,11 +414,15 @@ def remove_outliers(data, col):
     h = column.quantile(0.75) + 1.5 * IQR
     l = column.quantile(0.25) - 1.5 * IQR
     return data[column.between(l, h)]
+    
+def remove_outer_interval(data, col, low_value, max_value):
+    column = data[col]
+    return data[column.between(low_value, max_value)]    
 ```
 
 
 ```python
-df = remove_outliers(df, "age")
+df = remove_outer_interval(df, "age", 5, 100)
 ```
 
 
@@ -473,27 +477,27 @@ df.describe(include='all')
   <tbody>
     <tr>
       <th>count</th>
-      <td>21414.000000</td>
-      <td>21414.000000</td>
-      <td>21414.000000</td>
-      <td>6779.000000</td>
-      <td>9207.000000</td>
-      <td>19977.000000</td>
-      <td>21399.000000</td>
-      <td>21414</td>
-      <td>21414</td>
-      <td>21414</td>
+      <td>21501.000000</td>
+      <td>21501.000000</td>
+      <td>21501.000000</td>
+      <td>6812.000000</td>
+      <td>9263.000000</td>
+      <td>20056.000000</td>
+      <td>21486.000000</td>
+      <td>21501</td>
+      <td>21501</td>
+      <td>21501</td>
       <td>...</td>
-      <td>21414</td>
-      <td>1564</td>
-      <td>3211</td>
-      <td>600</td>
+      <td>21501</td>
+      <td>1570</td>
+      <td>3215</td>
+      <td>603</td>
       <td>29</td>
       <td>1898</td>
       <td>283</td>
-      <td>21414.000000</td>
-      <td>21414</td>
-      <td>21414</td>
+      <td>21501.000000</td>
+      <td>21501</td>
+      <td>21501</td>
     </tr>
     <tr>
       <th>unique</th>
@@ -505,19 +509,19 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>11</td>
-      <td>21410</td>
-      <td>9641</td>
+      <td>21497</td>
+      <td>9670</td>
       <td>...</td>
       <td>2</td>
-      <td>311</td>
-      <td>121</td>
-      <td>101</td>
+      <td>312</td>
+      <td>122</td>
+      <td>102</td>
       <td>14</td>
       <td>128</td>
       <td>4</td>
       <td>NaN</td>
-      <td>21414</td>
-      <td>21414</td>
+      <td>21501</td>
+      <td>21501</td>
     </tr>
     <tr>
       <th>top</th>
@@ -529,7 +533,7 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>CS100    3</td>
-      <td>1992-02-06 11:47:42</td>
+      <td>2000-08-08 09:34:05</td>
       <td>sinus rhythm. normal ecg.</td>
       <td>...</td>
       <td>True</td>
@@ -552,13 +556,13 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>6107</td>
+      <td>6133</td>
       <td>2</td>
-      <td>1720</td>
+      <td>1728</td>
       <td>...</td>
-      <td>15698</td>
-      <td>215</td>
-      <td>939</td>
+      <td>15761</td>
+      <td>216</td>
+      <td>941</td>
       <td>140</td>
       <td>8</td>
       <td>390</td>
@@ -569,13 +573,13 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>mean</th>
-      <td>11291.244186</td>
-      <td>59.736201</td>
-      <td>0.475016</td>
-      <td>166.930226</td>
-      <td>71.366895</td>
-      <td>2.271412</td>
-      <td>1.531707</td>
+      <td>11289.710665</td>
+      <td>59.550346</td>
+      <td>0.475141</td>
+      <td>166.860393</td>
+      <td>71.249703</td>
+      <td>2.270193</td>
+      <td>1.533976</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -587,19 +591,19 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>5.499626</td>
+      <td>5.498907</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>6224.296487</td>
-      <td>16.515259</td>
-      <td>0.499387</td>
-      <td>10.647564</td>
-      <td>15.707767</td>
-      <td>3.247071</td>
-      <td>4.157050</td>
+      <td>6224.143201</td>
+      <td>16.738679</td>
+      <td>0.499393</td>
+      <td>10.773875</td>
+      <td>15.772341</td>
+      <td>3.246346</td>
+      <td>4.170682</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -611,14 +615,14 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>2.875744</td>
+      <td>2.873692</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>min</th>
       <td>302.000000</td>
-      <td>17.000000</td>
+      <td>5.000000</td>
       <td>0.000000</td>
       <td>6.000000</td>
       <td>5.000000</td>
@@ -641,7 +645,7 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>25%</th>
-      <td>6056.250000</td>
+      <td>6053.000000</td>
       <td>50.000000</td>
       <td>0.000000</td>
       <td>160.000000</td>
@@ -665,8 +669,8 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>50%</th>
-      <td>11466.500000</td>
-      <td>62.000000</td>
+      <td>11466.000000</td>
+      <td>61.000000</td>
       <td>0.000000</td>
       <td>166.000000</td>
       <td>70.000000</td>
@@ -689,7 +693,7 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>75%</th>
-      <td>16637.000000</td>
+      <td>16636.000000</td>
       <td>72.000000</td>
       <td>1.000000</td>
       <td>174.000000</td>
@@ -750,7 +754,7 @@ df.shape
 
 
 
-    (21414, 27)
+    (21501, 27)
 
 
 
@@ -977,8 +981,13 @@ df.head(5)
 
 
 ```python
+display(x_raw_data.shape)
 x_raw_data
 ```
+
+
+    (21501, 5000, 12)
+
 
 
 
@@ -1041,38 +1050,38 @@ df.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
-    Index: 21414 entries, 1 to 21837
+    Index: 21501 entries, 1 to 21837
     Data columns (total 28 columns):
      #   Column                        Non-Null Count  Dtype  
     ---  ------                        --------------  -----  
-     0   patient_id                    21414 non-null  float64
-     1   age                           21414 non-null  float64
-     2   sex                           21414 non-null  int64  
-     3   height                        6779 non-null   float64
-     4   weight                        9207 non-null   float64
-     5   nurse                         19977 non-null  float64
-     6   site                          21399 non-null  float64
-     7   device                        21414 non-null  object 
-     8   recording_date                21414 non-null  object 
-     9   report                        21414 non-null  object 
-     10  scp_codes                     21414 non-null  object 
-     11  heart_axis                    13118 non-null  object 
-     12  infarction_stadium1           5488 non-null   object 
+     0   patient_id                    21501 non-null  float64
+     1   age                           21501 non-null  float64
+     2   sex                           21501 non-null  int64  
+     3   height                        6812 non-null   float64
+     4   weight                        9263 non-null   float64
+     5   nurse                         20056 non-null  float64
+     6   site                          21486 non-null  float64
+     7   device                        21501 non-null  object 
+     8   recording_date                21501 non-null  object 
+     9   report                        21501 non-null  object 
+     10  scp_codes                     21501 non-null  object 
+     11  heart_axis                    13167 non-null  object 
+     12  infarction_stadium1           5489 non-null   object 
      13  infarction_stadium2           100 non-null    object 
-     14  validated_by                  12104 non-null  float64
-     15  second_opinion                21414 non-null  bool   
-     16  initial_autogenerated_report  21414 non-null  bool   
-     17  validated_by_human            21414 non-null  bool   
-     18  baseline_drift                1564 non-null   object 
-     19  static_noise                  3211 non-null   object 
-     20  burst_noise                   600 non-null    object 
+     14  validated_by                  12136 non-null  float64
+     15  second_opinion                21501 non-null  bool   
+     16  initial_autogenerated_report  21501 non-null  bool   
+     17  validated_by_human            21501 non-null  bool   
+     18  baseline_drift                1570 non-null   object 
+     19  static_noise                  3215 non-null   object 
+     20  burst_noise                   603 non-null    object 
      21  electrodes_problems           29 non-null     object 
      22  extra_beats                   1898 non-null   object 
      23  pacemaker                     283 non-null    object 
-     24  strat_fold                    21414 non-null  int64  
-     25  filename_lr                   21414 non-null  object 
-     26  filename_hr                   21414 non-null  object 
-     27  scp_superclass                21414 non-null  object 
+     24  strat_fold                    21501 non-null  int64  
+     25  filename_lr                   21501 non-null  object 
+     26  filename_hr                   21501 non-null  object 
+     27  scp_superclass                21501 non-null  object 
     dtypes: bool(3), float64(7), int64(2), object(16)
     memory usage: 4.3+ MB
 
@@ -1137,27 +1146,27 @@ df.describe(include='all')
   <tbody>
     <tr>
       <th>count</th>
-      <td>21414.000000</td>
-      <td>21414.000000</td>
-      <td>21414.000000</td>
-      <td>6779.000000</td>
-      <td>9207.000000</td>
-      <td>19977.0</td>
-      <td>21399.0</td>
-      <td>21414</td>
-      <td>21414</td>
-      <td>21414</td>
+      <td>21501.000000</td>
+      <td>21501.000000</td>
+      <td>21501.000000</td>
+      <td>6812.000000</td>
+      <td>9263.000000</td>
+      <td>20056.0</td>
+      <td>21486.0</td>
+      <td>21501</td>
+      <td>21501</td>
+      <td>21501</td>
       <td>...</td>
-      <td>1564</td>
-      <td>3211</td>
-      <td>600</td>
+      <td>1570</td>
+      <td>3215</td>
+      <td>603</td>
       <td>29</td>
       <td>1898</td>
       <td>283</td>
-      <td>21414.000000</td>
-      <td>21414</td>
-      <td>21414</td>
-      <td>21414</td>
+      <td>21501.000000</td>
+      <td>21501</td>
+      <td>21501</td>
+      <td>21501</td>
     </tr>
     <tr>
       <th>unique</th>
@@ -1169,18 +1178,18 @@ df.describe(include='all')
       <td>&lt;NA&gt;</td>
       <td>&lt;NA&gt;</td>
       <td>11</td>
-      <td>21410</td>
-      <td>9641</td>
+      <td>21497</td>
+      <td>9670</td>
       <td>...</td>
-      <td>311</td>
-      <td>121</td>
-      <td>101</td>
+      <td>312</td>
+      <td>122</td>
+      <td>102</td>
       <td>14</td>
       <td>128</td>
       <td>4</td>
       <td>NaN</td>
-      <td>21414</td>
-      <td>21414</td>
+      <td>21501</td>
+      <td>21501</td>
       <td>27</td>
     </tr>
     <tr>
@@ -1193,7 +1202,7 @@ df.describe(include='all')
       <td>&lt;NA&gt;</td>
       <td>&lt;NA&gt;</td>
       <td>CS100    3</td>
-      <td>1992-02-06 11:47:42</td>
+      <td>2000-08-08 09:34:05</td>
       <td>sinus rhythm. normal ecg.</td>
       <td>...</td>
       <td>, V6</td>
@@ -1216,12 +1225,12 @@ df.describe(include='all')
       <td>NaN</td>
       <td>&lt;NA&gt;</td>
       <td>&lt;NA&gt;</td>
-      <td>6107</td>
+      <td>6133</td>
       <td>2</td>
-      <td>1720</td>
+      <td>1728</td>
       <td>...</td>
-      <td>215</td>
-      <td>939</td>
+      <td>216</td>
+      <td>941</td>
       <td>140</td>
       <td>8</td>
       <td>390</td>
@@ -1229,17 +1238,17 @@ df.describe(include='all')
       <td>NaN</td>
       <td>1</td>
       <td>1</td>
-      <td>8967</td>
+      <td>9035</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>11291.244186</td>
-      <td>59.736201</td>
-      <td>0.475016</td>
-      <td>166.930226</td>
-      <td>71.366895</td>
-      <td>2.271412</td>
-      <td>1.531707</td>
+      <td>11289.710665</td>
+      <td>59.550346</td>
+      <td>0.475141</td>
+      <td>166.860393</td>
+      <td>71.249703</td>
+      <td>2.270193</td>
+      <td>1.533976</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -1250,20 +1259,20 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>5.499626</td>
+      <td>5.498907</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>6224.296487</td>
-      <td>16.515259</td>
-      <td>0.499387</td>
-      <td>10.647564</td>
-      <td>15.707767</td>
-      <td>3.247071</td>
-      <td>4.15705</td>
+      <td>6224.143201</td>
+      <td>16.738679</td>
+      <td>0.499393</td>
+      <td>10.773875</td>
+      <td>15.772341</td>
+      <td>3.246346</td>
+      <td>4.170682</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -1274,7 +1283,7 @@ df.describe(include='all')
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>2.875744</td>
+      <td>2.873692</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -1282,7 +1291,7 @@ df.describe(include='all')
     <tr>
       <th>min</th>
       <td>302.000000</td>
-      <td>17.000000</td>
+      <td>5.000000</td>
       <td>0.000000</td>
       <td>6.000000</td>
       <td>5.000000</td>
@@ -1305,7 +1314,7 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>25%</th>
-      <td>6056.250000</td>
+      <td>6053.000000</td>
       <td>50.000000</td>
       <td>0.000000</td>
       <td>160.000000</td>
@@ -1329,8 +1338,8 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>50%</th>
-      <td>11466.500000</td>
-      <td>62.000000</td>
+      <td>11466.000000</td>
+      <td>61.000000</td>
       <td>0.000000</td>
       <td>166.000000</td>
       <td>70.000000</td>
@@ -1353,7 +1362,7 @@ df.describe(include='all')
     </tr>
     <tr>
       <th>75%</th>
-      <td>16637.000000</td>
+      <td>16636.000000</td>
       <td>72.000000</td>
       <td>1.000000</td>
       <td>174.000000</td>
@@ -1582,7 +1591,7 @@ df.loc[df.scp_superclass_len > 1, 'scp_superclass']
     21827    [STTC, MI]
     21828    [STTC, MI]
     21829    [NORM, CD]
-    Name: scp_superclass, Length: 4989, dtype: object
+    Name: scp_superclass, Length: 4997, dtype: object
 
 
 
@@ -1926,7 +1935,7 @@ df
     </tr>
   </tbody>
 </table>
-<p>21414 rows × 29 columns</p>
+<p>21501 rows × 29 columns</p>
 </div>
 
 
@@ -1964,7 +1973,7 @@ df.loc[df.scp_subclass_len > 1, 'scp_subclass']
     21828                  [sub_IMI, sub_ISCA]
     21829                [sub_IRBBB, sub_NORM]
     21832            [sub_IVCD, sub_LAFB/LPFB]
-    Name: scp_subclass, Length: 6001, dtype: object
+    Name: scp_subclass, Length: 6009, dtype: object
 
 
 
@@ -2414,7 +2423,7 @@ display(y_fold)
     </tr>
   </tbody>
 </table>
-<p>21414 rows × 36 columns</p>
+<p>21501 rows × 36 columns</p>
 </div>
 
 
@@ -2727,13 +2736,13 @@ plt.show()
 sns.set_style("whitegrid")
 bar,ax = plt.subplots(figsize=(10,20))
     
-ax.set_title("Распределение диагностического суперкласса с учетом мед персонала", fontsize=20)
+ax.set_title("Распределение диагностического суперкласса с учетом мед персонала", fontsize=10)
 
 all_index, all_count, all_values = [], [], []
 for nurse in y_fold.nurse.unique():
-    vc = y_fold.loc[y_all.nurse == nurse][superclass_cols].sum(axis=0)
+    vc = y_fold.loc[y_fold.nurse == nurse][superclass_cols].sum(axis=0)
     all_index += list(vc.index)
-    all_count += list(vc.values/y_all.shape[0]*100.)
+    all_count += list(vc.values/y_fold.shape[0]*100.)
     all_values += [nurse]*len(vc)
     #print(all_sex)
     
@@ -2762,9 +2771,9 @@ ax.set_title("Распределение диагностического суп
 
 all_index, all_count, all_values = [], [], []
 for site in y_fold.site.unique():
-    vc = y_fold.loc[y_all.site == site][superclass_cols].sum(axis=0)
+    vc = y_fold.loc[y_fold.site == site][superclass_cols].sum(axis=0)
     all_index += list(vc.index)
-    all_count += list(vc.values/y_all.shape[0]*100.)
+    all_count += list(vc.values/y_fold.shape[0]*100.)
     all_values += [site]*len(vc)
     #print(all_sex)
     
@@ -2791,12 +2800,11 @@ plt.show()
 bar,ax = plt.subplots(figsize=(10,20))    
 ax.set_title("Распределение диагностических суперклассов различных устройств", fontsize=10)
 all_index, all_count, all_values = [], [], []
-for device in y_all.device.unique():
-    vc = y_fold.loc[y_all.device == device][superclass_cols].sum(axis=0)
+for device in y_fold.device.unique():
+    vc = y_fold.loc[y_fold.device == device][superclass_cols].sum(axis=0)
     all_index += list(vc.index)
-    all_count += list(vc.values/y_all.shape[0]*100.)
+    all_count += list(vc.values/y_fold.shape[0]*100.)
     all_values += [device]*len(vc)
-    #print(all_sex)
     
 tmp_df = pd.DataFrame()
 tmp_df['diagnositic superclass'] = all_index
@@ -3150,16 +3158,16 @@ df[[col for col in df.columns if col not in ('scp_superclass','scp_codes', 'scp_
 
 
 
-    patient_id                      18532
-    age                                73
+    patient_id                      18607
+    age                                85
     sex                                 2
-    height                             70
-    weight                            119
+    height                             74
+    weight                            124
     nurse                              12
     site                               51
     device                             11
-    recording_date                  21410
-    report                           9641
+    recording_date                  21497
+    report                           9670
     heart_axis                          8
     infarction_stadium1                 6
     infarction_stadium2                 3
@@ -3167,15 +3175,15 @@ df[[col for col in df.columns if col not in ('scp_superclass','scp_codes', 'scp_
     second_opinion                      2
     initial_autogenerated_report        2
     validated_by_human                  2
-    baseline_drift                    311
-    static_noise                      121
-    burst_noise                       101
+    baseline_drift                    312
+    static_noise                      122
+    burst_noise                       102
     electrodes_problems                14
     extra_beats                       128
     pacemaker                           4
     strat_fold                         10
-    filename_lr                     21414
-    filename_hr                     21414
+    filename_lr                     21501
+    filename_hr                     21501
     scp_superclass_len                  5
     scp_subclass_len                    7
     dtype: int64
@@ -3188,43 +3196,141 @@ df.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
-    Index: 21414 entries, 1 to 21837
+    Index: 21501 entries, 1 to 21837
     Data columns (total 31 columns):
      #   Column                        Non-Null Count  Dtype  
     ---  ------                        --------------  -----  
-     0   patient_id                    21414 non-null  int64  
-     1   age                           21414 non-null  float64
-     2   sex                           21414 non-null  int64  
-     3   height                        6779 non-null   float64
-     4   weight                        9207 non-null   float64
-     5   nurse                         19977 non-null  Int64  
-     6   site                          21399 non-null  Int64  
-     7   device                        21414 non-null  object 
-     8   recording_date                21414 non-null  object 
-     9   report                        21414 non-null  object 
-     10  scp_codes                     21414 non-null  object 
-     11  heart_axis                    13118 non-null  object 
-     12  infarction_stadium1           5488 non-null   object 
+     0   patient_id                    21501 non-null  int64  
+     1   age                           21501 non-null  float64
+     2   sex                           21501 non-null  int64  
+     3   height                        6812 non-null   float64
+     4   weight                        9263 non-null   float64
+     5   nurse                         20056 non-null  Int64  
+     6   site                          21486 non-null  Int64  
+     7   device                        21501 non-null  object 
+     8   recording_date                21501 non-null  object 
+     9   report                        21501 non-null  object 
+     10  scp_codes                     21501 non-null  object 
+     11  heart_axis                    13167 non-null  object 
+     12  infarction_stadium1           5489 non-null   object 
      13  infarction_stadium2           100 non-null    object 
-     14  validated_by                  12104 non-null  Int64  
-     15  second_opinion                21414 non-null  bool   
-     16  initial_autogenerated_report  21414 non-null  bool   
-     17  validated_by_human            21414 non-null  bool   
-     18  baseline_drift                1564 non-null   object 
-     19  static_noise                  3211 non-null   object 
-     20  burst_noise                   600 non-null    object 
+     14  validated_by                  12136 non-null  Int64  
+     15  second_opinion                21501 non-null  bool   
+     16  initial_autogenerated_report  21501 non-null  bool   
+     17  validated_by_human            21501 non-null  bool   
+     18  baseline_drift                1570 non-null   object 
+     19  static_noise                  3215 non-null   object 
+     20  burst_noise                   603 non-null    object 
      21  electrodes_problems           29 non-null     object 
      22  extra_beats                   1898 non-null   object 
      23  pacemaker                     283 non-null    object 
-     24  strat_fold                    21414 non-null  int64  
-     25  filename_lr                   21414 non-null  object 
-     26  filename_hr                   21414 non-null  object 
-     27  scp_superclass                21414 non-null  object 
-     28  scp_superclass_len            21414 non-null  int64  
-     29  scp_subclass                  21414 non-null  object 
-     30  scp_subclass_len              21414 non-null  int64  
+     24  strat_fold                    21501 non-null  int64  
+     25  filename_lr                   21501 non-null  object 
+     26  filename_hr                   21501 non-null  object 
+     27  scp_superclass                21501 non-null  object 
+     28  scp_superclass_len            21501 non-null  int64  
+     29  scp_subclass                  21501 non-null  object 
+     30  scp_subclass_len              21501 non-null  int64  
     dtypes: Int64(3), bool(3), float64(3), int64(5), object(17)
     memory usage: 4.9+ MB
+
+
+
+```python
+y_fold.info()
+```
+
+    <class 'pandas.core.frame.DataFrame'>
+    Index: 21501 entries, 1 to 21837
+    Data columns (total 36 columns):
+     #   Column         Non-Null Count  Dtype  
+    ---  ------         --------------  -----  
+     0   age            21501 non-null  float64
+     1   nurse          20056 non-null  object 
+     2   site           21486 non-null  object 
+     3   device         21501 non-null  object 
+     4   sex            21501 non-null  int64  
+     5   height         6812 non-null   float64
+     6   weight         9263 non-null   float64
+     7   NORM           21501 non-null  int64  
+     8   MI             21501 non-null  int64  
+     9   STTC           21501 non-null  int64  
+     10  HYP            21501 non-null  int64  
+     11  CD             21501 non-null  int64  
+     12  sub_NORM       21501 non-null  int64  
+     13  sub_IMI        21501 non-null  int64  
+     14  sub_STTC       21501 non-null  int64  
+     15  sub_NST_       21501 non-null  int64  
+     16  sub_LVH        21501 non-null  int64  
+     17  sub_LAFB/LPFB  21501 non-null  int64  
+     18  sub_IRBBB      21501 non-null  int64  
+     19  sub_RAO/RAE    21501 non-null  int64  
+     20  sub_RVH        21501 non-null  int64  
+     21  sub_IVCD       21501 non-null  int64  
+     22  sub_LMI        21501 non-null  int64  
+     23  sub_AMI        21501 non-null  int64  
+     24  sub__AVB       21501 non-null  int64  
+     25  sub_ISCA       21501 non-null  int64  
+     26  sub_SEHYP      21501 non-null  int64  
+     27  sub_ISCI       21501 non-null  int64  
+     28  sub_ISC_       21501 non-null  int64  
+     29  sub_CRBBB      21501 non-null  int64  
+     30  sub_CLBBB      21501 non-null  int64  
+     31  sub_LAO/LAE    21501 non-null  int64  
+     32  sub_ILBBB      21501 non-null  int64  
+     33  sub_PMI        21501 non-null  int64  
+     34  sub_WPW        21501 non-null  int64  
+     35  strat_fold     21501 non-null  int64  
+    dtypes: float64(3), int64(30), object(3)
+    memory usage: 6.1+ MB
+
+
+
+```python
+y_fold.nunique(dropna=True)
+```
+
+
+
+
+    age               85
+    nurse             12
+    site              51
+    device            11
+    sex                2
+    height            74
+    weight           124
+    NORM               2
+    MI                 2
+    STTC               2
+    HYP                2
+    CD                 2
+    sub_NORM           2
+    sub_IMI            2
+    sub_STTC           2
+    sub_NST_           2
+    sub_LVH            2
+    sub_LAFB/LPFB      2
+    sub_IRBBB          2
+    sub_RAO/RAE        2
+    sub_RVH            2
+    sub_IVCD           2
+    sub_LMI            2
+    sub_AMI            2
+    sub__AVB           2
+    sub_ISCA           2
+    sub_SEHYP          2
+    sub_ISCI           2
+    sub_ISC_           2
+    sub_CRBBB          2
+    sub_CLBBB          2
+    sub_LAO/LAE        2
+    sub_ILBBB          2
+    sub_PMI            2
+    sub_WPW            2
+    strat_fold        10
+    dtype: int64
+
 
 
 
