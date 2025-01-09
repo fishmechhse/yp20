@@ -1,17 +1,17 @@
+import numpy as np
 from fastapi import HTTPException
 from fastapi import APIRouter
 from http import HTTPStatus
 from typing import List
 from typing import Dict
 
-
-from fastapi import File, UploadFile,Body
+from fastapi import File, UploadFile, Body
 from io import BytesIO
 import pandas as pd
 
 from model_trainer.models.models import FitRequest, FitResponse, LoadResponse, LoadRequest, UnloadResponse, \
     UnloadRequest, StatusResponse, PredictionResponse, PredictRequest, ModelListResponse, MLModel, RemoveResponse, \
-    ModelConfig, ModelType
+    ModelConfig, ModelType, PredictionModel
 from model_trainer.services.model_cache import LimitLoadedModelsException, ModelRegistry
 from model_trainer.services.model_storage import ModelStorage, NotFoundModelException
 from model_trainer.services.predict import fit_model, TrainedModel
@@ -47,7 +47,7 @@ async def fit(req: FitRequest):
 
 
 @router.post("/fit_csv", status_code=HTTPStatus.OK, response_model=List[FitResponse])
-async def fit_csv(model_id: str,  ml_model_type: ModelType, file: UploadFile = File(...)):
+async def fit_csv(model_id: str, ml_model_type: ModelType, file: UploadFile = File(...)):
     contents = file.file.read()
     buffer = BytesIO(contents)
     df = pd.read_csv(buffer, sep=',')
@@ -56,11 +56,8 @@ async def fit_csv(model_id: str,  ml_model_type: ModelType, file: UploadFile = F
     y = df['target'].values
     df.drop(columns=['target'], inplace=True)
     x = df.values
-    model_conf=ModelConfig(id=model_id, ml_model_type=ml_model_type, hyperparameters={})
+    model_conf = ModelConfig(id=model_id, ml_model_type=ml_model_type, hyperparameters={})
     fit_request = FitRequest(X=x, y=y, config=model_conf)
-    # res = predictor.predict_csv(df)
-    # output = res.to_csv(index=True)
-
     num_vacant_workers = shared_counter.try_lock_workers()
 
     if num_vacant_workers == 0:
@@ -128,24 +125,20 @@ async def get_status():
     return res
 
 
-@router.post("/predict", response_model=List[PredictionResponse])
-async def predict(req: List[PredictRequest]):
-    res: List[PredictionResponse] = []
-    for pred_op in req:
-        trained_model = model_registry.get_model(pred_op.id)
-        if trained_model is None:
-            raise HTTPException(status_code=404,
-                                detail=f"model '{pred_op.id}' not found")
-        reg = trained_model.get_regressor()
-        y = reg.predict(pred_op.X)
-        res.append(PredictionResponse(predictions=y))
-    return res
+@router.post("/predict", response_model=PredictionResponse)
+async def predict(req: PredictRequest):
+    trained_model = model_registry.get_model(req.id)
+    if trained_model is None:
+        raise HTTPException(status_code=404,
+                            detail=f"model '{req.id}' not found")
+    reg = trained_model.get_regressor()
+    labels = reg.predict(req.X)
+    probs = reg.predict_proba(req.X)
+    res = []
+    for index, prob in enumerate(probs):
+        res.append(PredictionModel(label=labels[index], probability=np.max(prob)))
 
-    #return StreamingResponse(
-    #    iter([output]),
-    #    media_type='text/csv',
-    #    headers={"Content-Disposition":
-    #                 "attachment;filename=prediction.csv"})
+    return PredictionResponse(predictions=res)
 
 
 @router.get("/models", response_model=List[ModelListResponse])

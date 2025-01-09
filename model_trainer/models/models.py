@@ -1,56 +1,78 @@
-from pydantic import BaseModel
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Annotated
 from enum import Enum
+from pydantic import BaseModel, Field
+
+
 class MLModel(BaseModel):
-    id: str
-    type: str
+    id: Annotated[str, Field(description="Model ID")]
+    type: Annotated[str, Field(description="Model type")]
+
 
 class StatusResponse(BaseModel):
-    status: str
+    status: Annotated[str, Field(description="Model status")]
+
 
 class ValidationError(BaseModel):
     loc: List[Union[str, int]]
     msg: str
     type: str
 
+
 class HTTPValidationError(BaseModel):
     detail: Optional[List[ValidationError]]
 
+
 class ModelType(str, Enum):
-    SVC = 'svc'
-    LOGIC = 'logistic'
-    UNDEFINED = 'undefined'
+    SVC = 'svc'  # SVC model
+    LOGIC = 'logistic'  # LogisticRegression model
+    UNDEFINED = 'undefined'  # undefined model
+
 
 class ModelConfig(BaseModel):
-    id: str
-    ml_model_type: ModelType
-    hyperparameters: dict
+    id: Annotated[str, Field(description="Model ID")]
+    ml_model_type: Annotated[ModelType, Field(description="model type. logistic or svc")]
+    hyperparameters: Annotated[dict, Field(description="hyperparameters for model")]
+
 
 class FitRequest(BaseModel):
-    X: List[List[float]]
-    y: List[str]
-    config: ModelConfig
+    X: Annotated[List[List[float]], Field(description="Input features for the model")]
+    y: Annotated[List[str], Field(description="Target labels for the classification task")]
+    config: Annotated[ModelConfig, Field(description="Configuration settings for the model")]
+
 
 class FitResponse(BaseModel):
-    message: str
+    message: Annotated[str, Field(description="Status model after training")]
+
 
 class UnloadRequest(BaseModel):
-    id: str
+    id: Annotated[str, Field(description="Model ID for unloading from inference")]
+
+
 class LoadRequest(BaseModel):
-    id: str
+    id: Annotated[str, Field(description="Model ID for unloading in inference")]
+
 
 class LoadResponse(BaseModel):
-    message: str
+    message: Annotated[str, Field(description="Model status after activation")]
+
 
 class ModelListResponse(BaseModel):
     models: List[MLModel]
+
 
 class PredictRequest(BaseModel):
     id: str
     X: List[List[float]]
 
+
+class PredictionModel(BaseModel):
+    label: str
+    probability: float
+
+
 class PredictionResponse(BaseModel):
-    predictions: List[float]
+    predictions: List[PredictionModel]
+
 
 class RemoveResponse(BaseModel):
     message: str

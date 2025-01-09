@@ -50,7 +50,7 @@ if __name__ == '__main__':
     X_np = X.to_numpy().tolist()
     y_np = y.to_numpy().tolist()
 
-    req = {
+    train_set = {
         "X": X_np,
         "y": y_np,
         "config": {
@@ -61,8 +61,15 @@ if __name__ == '__main__':
             }
         }
     }
-    with open('example_for_request.json', 'w') as json_file:
-        json.dump(req, json_file, indent=4)
+    with open('train_for_request.json', 'w') as json_file:
+        json.dump(train_set, json_file, indent=4)
+
+    test_set = {
+        "id": "111",
+        "X": X_np[:10]
+    }
+    with open('test_request.json', 'w') as json_file:
+        json.dump(test_set, json_file, indent=4)
 
     tmp_df.to_csv('clean_data_for_training.csv', index=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
