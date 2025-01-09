@@ -56,15 +56,29 @@ class TrainedModel:
 
 def fit_model(fit_req: FitRequest, return_dict):
     match fit_req.config.ml_model_type:
-        case ModelType.LINEAR:
+        case ModelType.SVC:
             return_dict[fit_req.config.id] = TrainedModel(
                 id=fit_req.config.id,
                 regressor=fit_linear_regression(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
-                model_type=ModelType.LINEAR
+                model_type=ModelType.SVC
             )
-            if "_60_" in fit_req.config.id:
-                print(f'{fit_req.config.id} fitting model during 60 seconds...')  # or logger.debug(), logger.error(), etc.
-                sleep(60)
+        case ModelType.LOGIC:
+            return_dict[fit_req.config.id] = TrainedModel(
+                id=fit_req.config.id,
+                regressor=fit_logistic_regression(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
+                model_type=ModelType.LOGIC
+            )
+        case _:
+            raise Exception("undefined model type")
+
+def fit_model_dataframe(fit_req: FitRequest, return_dict):
+    match fit_req.config.ml_model_type:
+        case ModelType.SVC:
+            return_dict[fit_req.config.id] = TrainedModel(
+                id=fit_req.config.id,
+                regressor=fit_linear_regression(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
+                model_type=ModelType.SVC
+            )
         case ModelType.LOGIC:
             return_dict[fit_req.config.id] = TrainedModel(
                 id=fit_req.config.id,

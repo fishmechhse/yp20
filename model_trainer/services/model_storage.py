@@ -83,8 +83,8 @@ class ModelStorage:
 
     def __convert_type(self, mt: ModelType) -> str:
         match mt:
-            case ModelType.LINEAR:
-                return 'linear'
+            case ModelType.SVC:
+                return 'svc'
             case ModelType.LOGIC:
                 return 'logic'
         return 'undefined'

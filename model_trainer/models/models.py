@@ -17,7 +17,7 @@ class HTTPValidationError(BaseModel):
     detail: Optional[List[ValidationError]]
 
 class ModelType(str, Enum):
-    LINEAR = 'linear'
+    SVC = 'svc'
     LOGIC = 'logistic'
     UNDEFINED = 'undefined'
 
@@ -28,7 +28,7 @@ class ModelConfig(BaseModel):
 
 class FitRequest(BaseModel):
     X: List[List[float]]
-    y: List[float]
+    y: List[str]
     config: ModelConfig
 
 class FitResponse(BaseModel):

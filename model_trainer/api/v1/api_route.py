@@ -2,10 +2,16 @@ from fastapi import HTTPException
 from fastapi import APIRouter
 from http import HTTPStatus
 from typing import List
+from typing import Dict
 
+
+from fastapi import File, UploadFile,Body
+from io import BytesIO
+import pandas as pd
 
 from model_trainer.models.models import FitRequest, FitResponse, LoadResponse, LoadRequest, UnloadResponse, \
-    UnloadRequest, StatusResponse, PredictionResponse, PredictRequest, ModelListResponse, MLModel, RemoveResponse
+    UnloadRequest, StatusResponse, PredictionResponse, PredictRequest, ModelListResponse, MLModel, RemoveResponse, \
+    ModelConfig, ModelType
 from model_trainer.services.model_cache import LimitLoadedModelsException, ModelRegistry
 from model_trainer.services.model_storage import ModelStorage, NotFoundModelException
 from model_trainer.services.predict import fit_model, TrainedModel
@@ -19,11 +25,6 @@ import asyncio
 
 router = APIRouter()
 
-
-def get_required_number_workers(items: List[FitRequest]) -> int:
-    return len(items)
-
-
 env_settings = Settings()
 
 shared_counter = SharedCounter(env_settings.num_cores)
@@ -34,8 +35,7 @@ model_registry = ModelRegistry(env_settings.max_models_loaded)
 # API endpoints
 @router.post("/fit", status_code=HTTPStatus.OK, response_model=List[FitResponse])
 async def fit(req: List[FitRequest]):
-    req_workers_num = get_required_number_workers(req)
-    num_vacant_workers = shared_counter.try_lock_workers(req_workers_num)
+    num_vacant_workers = shared_counter.try_lock_workers(1)
 
     if num_vacant_workers == 0:
         raise HTTPException(status_code=429, detail="Too many active training processes.")
@@ -46,14 +46,39 @@ async def fit(req: List[FitRequest]):
         shared_counter.decrement(num_vacant_workers)
 
 
-def async_process(req: List[FitRequest]):
+@router.post("/fit_csv", status_code=HTTPStatus.OK, response_model=List[FitResponse])
+async def fit_csv(model_id: str,  ml_model_type: ModelType, file: UploadFile = File(...)):
+    contents = file.file.read()
+    buffer = BytesIO(contents)
+    df = pd.read_csv(buffer, sep=',')
+    buffer.close()
+    file.file.close()
+    y = df['target'].values
+    df.drop(columns=['target'], inplace=True)
+    x = df.values
+    model_conf=ModelConfig(id=model_id, ml_model_type=ml_model_type, hyperparameters={})
+    fit_request = FitRequest(X=x, y=y, config=model_conf)
+    # res = predictor.predict_csv(df)
+    # output = res.to_csv(index=True)
+
+    num_vacant_workers = shared_counter.try_lock_workers()
+
+    if num_vacant_workers == 0:
+        raise HTTPException(status_code=429, detail="Too many active training processes.")
+    try:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, async_process, fit_request)
+    finally:
+        shared_counter.decrement(num_vacant_workers)
+    ##
+
+
+def async_process(fit_request: FitRequest):
     res: List[FitResponse] = []
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     processes = []
-    for model in req:
-        m = model
-        processes.append(multiprocessing.Process(target=fit_model, args=(m, return_dict)))
+    processes.append(multiprocessing.Process(target=fit_model, args=(fit_request, return_dict)))
     for p in processes:
         p.start()
     for p in processes:
@@ -115,8 +140,14 @@ async def predict(req: List[PredictRequest]):
         res.append(PredictionResponse(predictions=y))
     return res
 
+    #return StreamingResponse(
+    #    iter([output]),
+    #    media_type='text/csv',
+    #    headers={"Content-Disposition":
+    #                 "attachment;filename=prediction.csv"})
 
-@router.get("/list_models", response_model=List[ModelListResponse])
+
+@router.get("/models", response_model=List[ModelListResponse])
 async def list_models():
     list_id_types = model_storage.get_trained_model_id_with_types()
     models: List[MLModel] = []
@@ -145,4 +176,3 @@ async def remove():
     for m in models:
         res.append(RemoveResponse(message=f"Model '{m['id']}' removed"))
     return res
-
