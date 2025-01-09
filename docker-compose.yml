@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"  # Map port 8000 on host to port 8000 in container
+    environment:
+      - PYTHONPATH=/app  # Set PYTHONPATH if necessary for module imports

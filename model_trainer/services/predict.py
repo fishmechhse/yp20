@@ -1,12 +1,10 @@
-from time import sleep
-
-from sklearn.linear_model import LogisticRegression, LinearRegression
-from typing import List
-
-from model_trainer.models.models import ModelType, FitRequest
+from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
+from typing import List
+
+from model_trainer.models.models import ModelType, FitRequest
 
 
 def fit_logistic_regression(x: List[List[float]], y: List[str], hyperparameters: dict) -> Pipeline:
@@ -21,9 +19,8 @@ def fit_logistic_regression(x: List[List[float]], y: List[str], hyperparameters:
         hyperparameters = default_attr
 
     pipeline = Pipeline(steps=[
-        ('scaler', StandardScaler()),  # Step to scale features
+        ('scaler', StandardScaler()),
         ('logistic', LogisticRegression(**hyperparameters))
-        # Step to fit logistic regression model
     ])
     pipeline.fit(x, y)
     return pipeline
@@ -39,8 +36,8 @@ def fit_svc(x: List[List[float]], y: List[str], hyperparameters: dict) -> Pipeli
         hyperparameters = default_attr
 
     pipeline = Pipeline(steps=[
-        ('scaler', StandardScaler()),  # Step to scale features
-        ('logistic', SVC(**hyperparameters))  # Step to fit logistic regression model
+        ('scaler', StandardScaler()),
+        ('logistic', SVC(**hyperparameters))
     ])
     pipeline.fit(x, y)
 

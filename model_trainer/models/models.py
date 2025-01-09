@@ -30,14 +30,16 @@ class ModelType(str, Enum):
 
 class ModelConfig(BaseModel):
     id: Annotated[str, Field(description="Model ID")]
-    ml_model_type: Annotated[ModelType, Field(description="model type. logistic or svc")]
-    hyperparameters: Annotated[dict, Field(description="hyperparameters for model")]
+    ml_model_type: (
+        Annotated)[ModelType, Field(description="model type. logistic or svc")]
+    hyperparameters: (
+        Annotated)[dict, Field(description="hyperparameters for model")]
 
 
 class FitRequest(BaseModel):
-    X: Annotated[List[List[float]], Field(description="Input features for the model")]
-    y: Annotated[List[str], Field(description="Target labels for the classification task")]
-    config: Annotated[ModelConfig, Field(description="Configuration settings for the model")]
+    X: Annotated[List[List[float]], Field(description="Input features")]
+    y: Annotated[List[str], Field(description="Target labels")]
+    config: Annotated[ModelConfig, Field(description="Configuration settings")]
 
 
 class FitResponse(BaseModel):
@@ -45,15 +47,15 @@ class FitResponse(BaseModel):
 
 
 class UnloadRequest(BaseModel):
-    id: Annotated[str, Field(description="Model ID for unloading from inference")]
+    id: Annotated[str, Field(description="Model ID for unloading")]
 
 
 class LoadRequest(BaseModel):
-    id: Annotated[str, Field(description="Model ID for unloading in inference")]
+    id: Annotated[str, Field(description="Model ID for unloading")]
 
 
 class LoadResponse(BaseModel):
-    message: Annotated[str, Field(description="Model status after activation")]
+    message: Annotated[str, Field(description="Model status")]
 
 
 class ModelListResponse(BaseModel):

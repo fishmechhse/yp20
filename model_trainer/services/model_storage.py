@@ -1,8 +1,9 @@
 import joblib
+import json
 from pathlib import Path
 from multiprocessing import Lock
-import json
-from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 
 from model_trainer.models.models import ModelType
 from model_trainer.services.predict import TrainedModel
@@ -100,8 +101,8 @@ class ModelStorage:
         return res
 
     def get_type_for_regressor(self, regressor) -> ModelType:
-        if isinstance(regressor, LinearRegression):
-            return ModelType.LINEAR
+        if isinstance(regressor, SVC):
+            return ModelType.SVC
         if isinstance(regressor, LogisticRegression):
             return ModelType.LOGIC
         return ModelType.UNDEFINED

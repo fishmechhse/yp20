@@ -1,17 +1,27 @@
-import numpy as np
-from fastapi import HTTPException
-from fastapi import APIRouter
 from http import HTTPStatus
+from fastapi import APIRouter
 from typing import List
 from typing import Dict
 
 from fastapi import File, UploadFile, Body
 from io import BytesIO
 import pandas as pd
+import numpy as np
+from fastapi import HTTPException
 
-from model_trainer.models.models import FitRequest, FitResponse, LoadResponse, LoadRequest, UnloadResponse, \
-    UnloadRequest, StatusResponse, PredictionResponse, PredictRequest, ModelListResponse, MLModel, RemoveResponse, \
-    ModelConfig, ModelType, PredictionModel
+from model_trainer.models.models import FitRequest
+from model_trainer.models.models import FitResponse
+from model_trainer.models.models import LoadResponse
+from model_trainer.models.models import LoadRequest
+from model_trainer.models.models import UnloadResponse
+from model_trainer.models.models import UnloadRequest, StatusResponse
+
+from model_trainer.models.models import PredictionResponse
+from model_trainer.models.models import PredictRequest
+from model_trainer.models.models import ModelListResponse
+from model_trainer.models.models import MLModel
+from model_trainer.models.models import RemoveResponse
+from model_trainer.models.models import ModelConfig, ModelType, PredictionModel
 from model_trainer.services.model_cache import LimitLoadedModelsException, ModelRegistry
 from model_trainer.services.model_storage import ModelStorage, NotFoundModelException
 from model_trainer.services.predict import fit_model, TrainedModel
