@@ -3,22 +3,48 @@ from time import sleep
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from typing import List
 
-
 from model_trainer.models.models import ModelType, FitRequest
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
 
 
-def fit_logistic_regression(x: List[List[float]], y: List[float], hyperparameters: dict) -> LogisticRegression:
+def fit_logistic_regression(x: List[List[float]], y: List[str], hyperparameters: dict) -> Pipeline:
     # todo: check hyperparameters
-    reg = LogisticRegression(**hyperparameters)
-    reg.fit(x, y)
-    return reg
+    default_attr = {
+        "solver": "liblinear",
+        "max_iter": 600,
+        "class_weight": "balanced"
+    }
+
+    if len(hyperparameters) == 0:
+        hyperparameters = default_attr
+
+    pipeline = Pipeline(steps=[
+        ('scaler', StandardScaler()),  # Step to scale features
+        ('logistic', LogisticRegression(**hyperparameters))
+        # Step to fit logistic regression model
+    ])
+    pipeline.fit(x, y)
+    return pipeline
 
 
-def fit_linear_regression(x: List[List[float]], y: List[float], hyperparameters: dict) -> LinearRegression:
+def fit_svc(x: List[List[float]], y: List[str], hyperparameters: dict) -> Pipeline:
     # todo:  check hyperparameters
-    reg = LinearRegression(**hyperparameters)
-    reg.fit(x, y)
-    return reg
+    default_attr = {
+        "class_weight": "balanced"
+    }
+
+    if len(hyperparameters) == 0:
+        hyperparameters = default_attr
+
+    pipeline = Pipeline(steps=[
+        ('scaler', StandardScaler()),  # Step to scale features
+        ('logistic', SVC(**hyperparameters))  # Step to fit logistic regression model
+    ])
+    pipeline.fit(x, y)
+
+    return pipeline
 
 
 class ModelManager:
@@ -59,7 +85,7 @@ def fit_model(fit_req: FitRequest, return_dict):
         case ModelType.SVC:
             return_dict[fit_req.config.id] = TrainedModel(
                 id=fit_req.config.id,
-                regressor=fit_linear_regression(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
+                regressor=fit_svc(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
                 model_type=ModelType.SVC
             )
         case ModelType.LOGIC:
@@ -70,13 +96,14 @@ def fit_model(fit_req: FitRequest, return_dict):
             )
         case _:
             raise Exception("undefined model type")
+
 
 def fit_model_dataframe(fit_req: FitRequest, return_dict):
     match fit_req.config.ml_model_type:
         case ModelType.SVC:
             return_dict[fit_req.config.id] = TrainedModel(
                 id=fit_req.config.id,
-                regressor=fit_linear_regression(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
+                regressor=fit_svc(fit_req.X, fit_req.y, fit_req.config.hyperparameters),
                 model_type=ModelType.SVC
             )
         case ModelType.LOGIC:
@@ -87,5 +114,3 @@ def fit_model_dataframe(fit_req: FitRequest, return_dict):
             )
         case _:
             raise Exception("undefined model type")
-
-

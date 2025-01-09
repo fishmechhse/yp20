@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 from sklearn.multiclass import OneVsRestClassifier
+import json
 
 
 def create_target(scp_superclass):
@@ -14,6 +15,7 @@ def create_target(scp_superclass):
         return 'NORM'
     else:
         return 'PROBLEM'
+
 
 if __name__ == '__main__':
     df = pd.read_csv('v5_v2_ecg_extracted_features.csv', converters={'scp_superclass': pd.eval})
@@ -42,14 +44,33 @@ if __name__ == '__main__':
     tmp_df = tmp_df.dropna()
     print(tmp_df['target'].value_counts())
     y = tmp_df['target']
-    X = tmp_df.drop(columns=['target'])
     tmp_df = tmp_df.round(4)
+    X = tmp_df.drop(columns=['target'])
+
+    X_np = X.to_numpy().tolist()
+    y_np = y.to_numpy().tolist()
+
+    req = {
+        "X": X_np,
+        "y": y_np,
+        "config": {
+            "id": "string",
+            "ml_model_type": "svc",
+            "hyperparameters": {
+                'C': 0.1
+            }
+        }
+    }
+    with open('example_for_request.json', 'w') as json_file:
+        json.dump(req, json_file, indent=4)
+
     tmp_df.to_csv('clean_data_for_training.csv', index=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
     pipeline = Pipeline(steps=[
         ('scaler', StandardScaler()),  # Step to scale features
-        ('logistic', OneVsRestClassifier(LogisticRegression(solver='liblinear',max_iter=1200, class_weight='balanced')))  # Step to fit logistic regression model
+        ('logistic', LogisticRegression(solver='liblinear', max_iter=1200, class_weight='balanced'))
+        # Step to fit logistic regression model
     ])
     pipeline.fit(X_train, y_train)
 
@@ -59,12 +80,10 @@ if __name__ == '__main__':
 
     pipeline = Pipeline(steps=[
         ('scaler', StandardScaler()),  # Step to scale features
-        ('logistic', OneVsRestClassifier(SVC(class_weight='balanced')))  # Step to fit logistic regression model
+        ('logistic', SVC(class_weight='balanced'))  # Step to fit logistic regression model
     ])
     pipeline.fit(X_train, y_train)
-
 
     y_pred = pipeline.predict(X_test)
     print('svc')
     print(classification_report(y_test, y_pred))
-

@@ -34,7 +34,7 @@ model_registry = ModelRegistry(env_settings.max_models_loaded)
 
 # API endpoints
 @router.post("/fit", status_code=HTTPStatus.OK, response_model=List[FitResponse])
-async def fit(req: List[FitRequest]):
+async def fit(req: FitRequest):
     num_vacant_workers = shared_counter.try_lock_workers(1)
 
     if num_vacant_workers == 0:
@@ -78,6 +78,7 @@ def async_process(fit_request: FitRequest):
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     processes = []
+    # for training 2 models at the same time
     processes.append(multiprocessing.Process(target=fit_model, args=(fit_request, return_dict)))
     for p in processes:
         p.start()
