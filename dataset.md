@@ -91,8 +91,9 @@
 |              | HYP     | Hypertrophy               | 
 |              | STTC    | ST/T change               | 
 
-| Subclasses | NORM | 	NORM     | Normal ECG                                                   |
+| Subclasses |      | 	         |                                                              |
 |------------|------|-----------|--------------------------------------------------------------|
+|            | NORM | 	NORM     | Normal ECG                                                   |
 |            | CD	  | LAFB/LPFB | 	left anterior/left posterior fascicular block               |
 |            |      | IRBBB     | 	incomplete right bundle branch block                        |
 |            |      | ILBBB     | 	incomplete left bundle branch block                         |
