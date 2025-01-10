@@ -1,0 +1,3 @@
+NUM_CORES=2
+MODEL_DIR="./trained_models"
+MAX_MODELS_LOADED=2

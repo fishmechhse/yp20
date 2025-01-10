@@ -29,7 +29,8 @@ def fit_logistic_regression(x: List[List[float]], y: List[str], hyperparameters:
 def fit_svc(x: List[List[float]], y: List[str], hyperparameters: dict) -> Pipeline:
     # todo:  check hyperparameters
     default_attr = {
-        "class_weight": "balanced"
+        "class_weight": "balanced",
+        "probability": True
     }
 
     if len(hyperparameters) == 0:

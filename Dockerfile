@@ -13,4 +13,4 @@ COPY ./model_trainer /app/
 
 RUN mkdir -p /app/models
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8088"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
