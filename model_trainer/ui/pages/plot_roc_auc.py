@@ -1,10 +1,12 @@
 
 import streamlit as st
 import json
-from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
+from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, classification_report
 import matplotlib.pyplot as plt
 from api_func import post_data_predict, post_data
 from api_path import url_load, url_predict, url_unload
+import pandas as pd
+
 st.title("Построение кривых обучения:")
 st.subheader("Загрузка модели")
 id = st.text_input("Введите id ранее обученной модели", None, key="load_id")
@@ -16,7 +18,7 @@ if st.button("Загрузить модель"):
             st.markdown(f"Модель '{id}' была загружена")
         elif response.status == 422:
             st.markdown(f"Модель '{id}' не была загружена")
-            if 'not found file of model' in result_response['detail'][0]['msg']:
+            if 'not found' in dict(result_response['detail'])[0]['msg']:
                 st.markdown(f"Модель '{id}' не была найдена. Возможно она не была обучена.")
             else:
                 st.markdown(str(result_response))
@@ -59,18 +61,29 @@ if st.button("Построение"):
             st.markdown(f"Precision: {precision:.2f}")
             st.markdown(f"Recall: {recall:.2f}")
             st.markdown(f"F1 Score: {f1:.2f}")
-            
-            fpr, tpr, thresholds = roc_curve(y_test, y_probs, pos_label="PROBLEM")
-            roc_auc = auc(fpr, tpr)
+
+            cm = confusion_matrix(y_test, y_pred, labels=["NORM", "PROBLEM"])
+            df = pd.DataFrame(cm)
+            df['name'] = ["NORM", "PROBLEM"]
+            df.set_index("name", inplace=True)
+            df.columns =  ["NORM", "PROBLEM"]
+            st.markdown("Сonfusion_matrix:")
+            st.table(df)
+
+            st.dataframe(pd.DataFrame(classification_report(y_test, y_pred, target_names=["NORM", "PROBLEM"], output_dict=True)).transpose())
+
+            fpr_p, tpr_p, thresholds = roc_curve(y_test, y_probs, pos_label="PROBLEM")
+            fpr_n, tpr_n, thresholds = roc_curve(y_test, y_probs, pos_label="NORM")
+            roc_auc = auc(fpr_p, tpr_p)
 
             fig = plt.figure()
-            plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'Кривые обучения)')
-            plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-            plt.xlim([0.0, 1.0])
+            plt.plot(fpr_p, tpr_p, color='darkorange', lw=2, label='ROC Curve for PROBLEM ECG')
+            plt.plot(fpr_n, tpr_n, color='navy', lw=2, label='ROC Curve for NORM ECG')
+            plt.xlim([0.0, 1.05])
             plt.ylim([0.0, 1.05])
-            plt.xlabel('Ложно положительный рейтинг')
-            plt.ylabel('Верно положительный рейтинг')
-            plt.title('ROC-кривые')
+            plt.xlabel('False Positive rate')
+            plt.ylabel('True Positive rate')
+            plt.title('ROC-AUC Curve')
             plt.legend(loc="lower right")
             plt.show()
             st.pyplot(fig)
@@ -80,10 +93,11 @@ if st.button("Построение"):
             st.markdown("Данные  имеют некорректный формат.")
         else:
             st.markdown("Не удалось провести анализ данных.")
-            if 'not found' in result_response['detail'][0]['msg']:
-                st.markdown(f"Модель {id_pred} не найдена. Для её использования, пожалуйста, сначала загрузите её.")
-            else:
-                st.markdown(str(result_response))
+            try:
+                if 'not found' in result_response['detail'][0]['msg']:
+                    st.markdown(f"Модель {id_roc} не найдена. Для её использования, пожалуйста, сначала загрузите её.")
+            except:
+                    st.markdown(str(result_response))
     else:
         if data_file is None:
             st.write("Выберите файл для построения кривых.")

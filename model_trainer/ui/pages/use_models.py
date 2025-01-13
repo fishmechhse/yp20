@@ -76,18 +76,19 @@ if st.button("Анализ"):
         if response.status == 200:
             st.markdown("Анализ ЭКГ:")
             for prediction in result_response['predictions']:
-                label = "В данных не найдено отклонений"
+                label = "нет проблем"
                 if prediction['label'] == "PROBLEM":
-                    label = "В данных **возможны** отклонения"
-                st.markdown(f"{label} с вероятностью {round(prediction['probability'], 4)}")
+                    label = "есть проблема"
+                st.markdown(f"У пациента с вероятностью {round(prediction['probability'], 4)} {label} со здоровьем")
         elif response.status == 422:
             st.markdown("Не удалось провести анализ данных.")
             st.markdown("Данные  имеют некорректный формат.")
         else:
             st.markdown("Не удалось провести анализ данных.")
-            if 'not found' in result_response['detail'][0]['msg']:
-                st.markdown(f"Модель {id_pred} не найдена. Для её использования, пожалуйста, сначала загрузите её.")
-            else:
+            try:
+                if 'not found' in dict(result_response)['detail'][0]['msg']:
+                    st.markdown(f"Модель {id_pred} не найдена. Для её использования, пожалуйста, сначала загрузите её.")
+            except:
                 st.markdown(str(result_response))
 
 st.subheader("Выгрузка модели")
