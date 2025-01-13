@@ -3,14 +3,6 @@ import streamlit as st
 import json
 from api_path import url_get_status, url_list_models, url_remove_id, url_remove_all
 st.title("Описание моделей:")
-st.subheader("Получение статуса:")
-if st.button("Получить статус"):
-    response, result_response = fetch_data(url_get_status)
-    if response.status == 200:
-        st.markdown("Статус: " + str(result_response))
-    else:
-        st.markdown("Не удалось получить статус:")
-        st.markdown(str(result_response))
 
 st.subheader("Список моделей:")
 if st.button("Получить"):
