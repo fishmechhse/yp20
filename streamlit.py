@@ -60,7 +60,7 @@ async def main():
         df = uploaded_csv_file
         st.write("Файлы загружен")
 
-        df = pd.read_csv(csv_file)
+        df = pd.read_csv(uploaded_csv_file)
         st.write('Первые 5 строк')
         st.write(df.head())
         st.write('Описательная статистика')
