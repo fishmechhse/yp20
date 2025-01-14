@@ -20,14 +20,15 @@ from dataset.pca import plot_projection, make_pca
 
 def create_target(scp_superclass):
     if ('NORM' in scp_superclass) and (len(scp_superclass) == 1):
-        return 0
+        return 'NORM'
     else:
-        return 1
+        return 'PROBLEM'
 
 
 def print_roc_auc(y_test, y_probability, label):
     print(roc_auc_score(y_test, y_probability))
 
+    y_test = y_test.map({'NORM': 0, 'PROBLEM': 1}).astype(int)
     fpr, tpr, threshold = roc_curve(y_test, y_probability)
     roc_auc = auc(fpr, tpr)
 
@@ -41,11 +42,12 @@ def print_roc_auc(y_test, y_probability, label):
     plt.xlabel('False Positive Rate')
     plt.show()
 
+
 if __name__ == '__main__':
     df = pd.read_csv('v5_v2_ecg_extracted_features.csv', converters={'scp_superclass': pd.eval})
     columns = []
     for column in df.columns:
-        if ('_stat_' in column) | ('_interval_' in column):
+        if ('stat_' in column) | ('_interval_' in column):
             columns.append(column)
 
     columns.append('ECG_Rate_mean')
@@ -111,12 +113,10 @@ if __name__ == '__main__':
     print('regression')
     print(classification_report(y_test, y_pred))
 
-    y_probability = pipeline.predict_proba(X_test)[:,1]
+    y_probability = pipeline.predict_proba(X_test)[:, 1]
     print_roc_auc(y_test, y_probability, 'Logistic Regression: ')
     ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
     plt.show()
-
-
 
     pipeline = Pipeline(steps=[
         ('scaler', StandardScaler()),  # Step to scale features
@@ -128,9 +128,7 @@ if __name__ == '__main__':
     print('svc')
     print(classification_report(y_test, y_pred))
 
-    y_probability = pipeline.predict_proba(X_test)[:,1]
+    y_probability = pipeline.predict_proba(X_test)[:, 1]
     print_roc_auc(y_test, y_probability, 'SVC model: ')
     ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
     plt.show()
-
-
