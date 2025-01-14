@@ -13,6 +13,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.decomposition import PCA
+
+from dataset.pca import plot_projection, make_pca
 
 
 def create_target(scp_superclass):
@@ -95,6 +98,8 @@ if __name__ == '__main__':
     tmp_df.to_csv('clean_data_for_training.csv', index=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
+    make_pca(X, y)
+
     pipeline = Pipeline(steps=[
         ('scaler', StandardScaler()),  # Step to scale features
         ('logistic', LogisticRegression(solver='liblinear', max_iter=1200, class_weight='balanced'))
@@ -108,13 +113,9 @@ if __name__ == '__main__':
 
     y_probability = pipeline.predict_proba(X_test)[:,1]
     print_roc_auc(y_test, y_probability, 'Logistic Regression: ')
-
-    cm = confusion_matrix(y_test, y_pred, labels=pipeline.classes_)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm,
-                                  display_labels=pipeline.classes_)
-
-    disp.plot()
+    ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
     plt.show()
+
 
 
     pipeline = Pipeline(steps=[
