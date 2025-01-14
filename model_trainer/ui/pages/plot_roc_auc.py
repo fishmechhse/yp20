@@ -1,7 +1,7 @@
 
 import streamlit as st
 import json
-from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, classification_report
+from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, classification_report, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 from api_func import post_data_predict, post_data
 from api_path import url_load, url_predict, url_unload
@@ -63,13 +63,11 @@ if st.button("Построение"):
             st.markdown(f"F1 Score: {f1:.2f}")
 
             cm = confusion_matrix(y_test, y_pred, labels=["NORM", "PROBLEM"])
-            df = pd.DataFrame(cm)
-            df['name'] = ["NORM", "PROBLEM"]
-            df.set_index("name", inplace=True)
-            df.columns =  ["NORM", "PROBLEM"]
-            st.markdown("Сonfusion_matrix:")
-            st.table(df)
-
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                                  display_labels=["NORM", "PROBLEM"])
+            disp.plot()
+            plt.show()
+            st.pyplot(plt)
             st.dataframe(pd.DataFrame(classification_report(y_test, y_pred, target_names=["NORM", "PROBLEM"], output_dict=True)).transpose())
 
             fpr_p, tpr_p, thresholds = roc_curve(y_test, y_probs, pos_label="PROBLEM")
@@ -77,14 +75,14 @@ if st.button("Построение"):
             roc_auc = auc(fpr_p, tpr_p)
 
             fig = plt.figure()
-            plt.plot(fpr_p, tpr_p, color='darkorange', lw=2, label='ROC Curve for PROBLEM ECG')
-            plt.plot(fpr_n, tpr_n, color='navy', lw=2, label='ROC Curve for NORM ECG')
-            plt.xlim([0.0, 1.05])
-            plt.ylim([0.0, 1.05])
-            plt.xlabel('False Positive rate')
-            plt.ylabel('True Positive rate')
-            plt.title('ROC-AUC Curve')
-            plt.legend(loc="lower right")
+            plt.title(f'Receiver Operating Characteristic')
+            plt.plot(fpr_p, tpr_p, 'b', label='AUC = %0.2f' % roc_auc)
+            plt.legend(loc='lower right')
+            plt.plot([0, 1], [0, 1], 'r--')
+            plt.xlim([0, 1])
+            plt.ylim([0, 1])
+            plt.ylabel('True Positive Rate')
+            plt.xlabel('False Positive Rate')
             plt.show()
             st.pyplot(fig)
             
