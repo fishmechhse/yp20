@@ -9,13 +9,34 @@ from sklearn.metrics import classification_report
 from sklearn.multiclass import OneVsRestClassifier
 import json
 
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
 
 def create_target(scp_superclass):
     if ('NORM' in scp_superclass) and (len(scp_superclass) == 1):
-        return 'NORM'
+        return 0
     else:
-        return 'PROBLEM'
+        return 1
 
+
+def print_roc_auc(y_test, y_probability, label):
+    print(roc_auc_score(y_test, y_probability))
+
+    fpr, tpr, threshold = roc_curve(y_test, y_probability)
+    roc_auc = auc(fpr, tpr)
+
+    plt.title(f'{label}Receiver Operating Characteristic')
+    plt.plot(fpr, tpr, 'b', label='AUC = %0.2f' % roc_auc)
+    plt.legend(loc='lower right')
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.show()
 
 if __name__ == '__main__':
     df = pd.read_csv('v5_v2_ecg_extracted_features.csv', converters={'scp_superclass': pd.eval})
@@ -85,12 +106,30 @@ if __name__ == '__main__':
     print('regression')
     print(classification_report(y_test, y_pred))
 
+    y_probability = pipeline.predict_proba(X_test)[:,1]
+    print_roc_auc(y_test, y_probability, 'Logistic Regression: ')
+
+    cm = confusion_matrix(y_test, y_pred, labels=pipeline.classes_)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                                  display_labels=pipeline.classes_)
+
+    disp.plot()
+    plt.show()
+
+
     pipeline = Pipeline(steps=[
         ('scaler', StandardScaler()),  # Step to scale features
-        ('logistic', SVC(class_weight='balanced'))  # Step to fit logistic regression model
+        ('logistic', SVC(class_weight='balanced', probability=True))  # Step to fit logistic regression model
     ])
     pipeline.fit(X_train, y_train)
 
     y_pred = pipeline.predict(X_test)
     print('svc')
     print(classification_report(y_test, y_pred))
+
+    y_probability = pipeline.predict_proba(X_test)[:,1]
+    print_roc_auc(y_test, y_probability, 'SVC model: ')
+    ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
+    plt.show()
+
+
